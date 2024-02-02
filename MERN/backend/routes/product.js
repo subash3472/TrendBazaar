@@ -8,8 +8,11 @@ const {
   deleteproduct,
 } = require("../controllers/productcontroller");
 const router = express.Router();
+const { isAutenticateduser } = require("../middlewares/autenticate");
 
-router.route("/products").get(getproducts);
+// ...............................................................................
+
+router.route("/products").get(isAutenticateduser, getproducts);
 router.route("/product/new").post(newProduct);
 
 // router.route("/product/:id").get(getsingleproduct);

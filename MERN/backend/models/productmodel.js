@@ -78,9 +78,11 @@ const productSchema = new mongoose.Schema({
       },
     },
   ],
+  // if any crud operation is done , i need to know who created this for that im buying here user objectid
   user: {
     type: mongoose.Schema.Types.ObjectId,
   },
+
   createdAt: {
     type: Date,
     default: Date.now(),

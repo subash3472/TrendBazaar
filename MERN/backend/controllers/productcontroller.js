@@ -22,6 +22,7 @@ exports.getproducts = async (req, res, next) => {
 // ..........................................................
 // create product - /api/v1/product/new
 exports.newProduct = catchAsyncError(async (req, res, next) => {
+  req.body.user = req.user.id;
   const product = await Product.create(req.body);
   res.status(201).json({
     success: true,

@@ -17,8 +17,9 @@ const {
 
 router.route("/products").get(isAutenticateduser, getproducts);
 // ..........................
+// admin routes
 router
-  .route("/product/new")
+  .route("admin/product/new")
   .post(isAutenticateduser, authorizeRoles("admin"), newProduct);
 
 router

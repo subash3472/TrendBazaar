@@ -1,9 +1,10 @@
-const catchasyncerror = require("../middlewares/catchasyncerror");
+const catchAsyncError = require("../middlewares/catchasyncerror");
+const Product = require("../models/productmodel");
 const Order = require("../models/ordermodel");
 const ErrorHandler = require("../utils/errorhandler");
 
 // create new order - {{base_url}}/api/v1/order/new
-exports.newOrder = catchasyncerror(async (req, res, next) => {
+exports.newOrder = catchAsyncError(async (req, res, next) => {
   const {
     orderItems,
     shippingInfo,
@@ -36,7 +37,7 @@ exports.newOrder = catchasyncerror(async (req, res, next) => {
 
 // populate() is used to find db
 
-exports.getsingleOrder = catchasyncerror(async (req, res, next) => {
+exports.getsingleOrder = catchAsyncError(async (req, res, next) => {
   const order = await Order.findById(req.params.id).populate(
     "user",
     "name email"
@@ -55,7 +56,7 @@ exports.getsingleOrder = catchasyncerror(async (req, res, next) => {
 // get Loggedin user orders
 // {{base_url}}/api/v1/myorders
 
-exports.myOrders = catchasyncerror(async (req, res, next) => {
+exports.myOrders = catchAsyncError(async (req, res, next) => {
   const orders = await Order.find({ user: req.user.id });
 
   res.status(200).json({
@@ -64,9 +65,10 @@ exports.myOrders = catchasyncerror(async (req, res, next) => {
   });
 });
 
-// Admin: Get All users Orders -
+// Admin: Get All users Orders
+// {{base_url}}/api/v1/orders
 
-exports.orders = catchasyncerror(async (req, res, next) => {
+exports.orders = catchAsyncError(async (req, res, next) => {
   const orders = await Order.find();
 
   let totalAmount = 0;
@@ -78,5 +80,51 @@ exports.orders = catchasyncerror(async (req, res, next) => {
     success: true,
     totalAmount,
     orders,
+  });
+});
+
+// Admin: update order or order status
+
+exports.updateOrder = catchAsyncError(async (req, res, next) => {
+  //orderer id getting form req
+  const order = await Order.findById(req.params.id);
+  if (order.orderStatus == "Delivered") {
+    return next(new ErrorHandler("order has been already Delivered!"), 400);
+  }
+
+  //updating the product stock of each item
+  order.orderItems.forEach(async (orderItem) => {
+    await updatestock(orderItem.product, orderItem.quantity);
+  });
+
+  // Update order status and deliveredAt
+  order.orderStatus = req.body.orderStatus;
+  order.deliveredAt = Date.now();
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+async function updatestock(productId, quantity) {
+  // product id
+  const product = await Product.findById(productId);
+  product.stock = product.stock - quantity;
+  product.save({ validateBeforeSave: false });
+}
+
+// Admin: Delete order - api/v1/order/:id
+exports.deleteOrder = catchAsyncError(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    return next(
+      new ErrorHandler(`Order not found with this id: ${req.params.id}`, 404)
+    );
+  }
+  await order.deleteOne();
+  res.status(200).json({
+    success: true,
   });
 });

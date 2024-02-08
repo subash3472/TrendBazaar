@@ -185,12 +185,12 @@ exports.updateUser = catchAsyncError(async (req, res, next) => {
 // {{base_url}}/api/v1/admin/user/:id
 
 exports.deleteUser = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-  if (!user) {
-    return next(new ErrorHandler(`user not found in this id ${user}`));
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(new ErrorHandler(`user not found in this id : ${order}`));
   }
 
-  await user.deleteOne();
+  await order.deleteOne();
   res.status(200).json({
     success: true,
   });

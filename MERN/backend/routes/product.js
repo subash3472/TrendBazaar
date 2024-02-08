@@ -6,6 +6,9 @@ const {
   getsingleproduct,
   updateproduct,
   deleteproduct,
+  createReview,
+  getReviews,
+  deletReview,
 } = require("../controllers/productcontroller");
 const router = express.Router();
 const {
@@ -16,6 +19,13 @@ const {
 // ...............................................................................
 
 router.route("/products").get(isAutenticateduser, getproducts);
+// reviews
+
+router.route("/review").put(isAutenticateduser, createReview);
+router.route("/reviews").get(isAutenticateduser, getReviews);
+// router.route("/review").delete(isAutenticateduser, deletReview);
+router.route("/review").delete(deletReview);
+
 // ..........................
 // admin routes
 router

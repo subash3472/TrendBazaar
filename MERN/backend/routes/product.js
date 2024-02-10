@@ -18,7 +18,8 @@ const {
 
 // ...............................................................................
 
-router.route("/products").get(isAutenticateduser, getproducts);
+// router.route("/products").get(isAutenticateduser, getproducts);
+router.route("/products").get(getproducts);
 // reviews
 
 router.route("/review").put(isAutenticateduser, createReview);
